@@ -2,14 +2,17 @@ require("dotenv").config();
 const cron = require("node-cron");
 const cheerio = require("cheerio");
 const axios = require('axios');
-const {Telegraf} = require('telegraf');
+const {Telegraf, Markup} = require('telegraf');
 const {ru} = require('date-fns/locale');
 const {formatDate} = require('date-fns');
 
 const YOUR_BOT_TOKEN = process.env.YOUR_BOT_TOKEN;
 const YOUR_CHAT_ID = process.env.YOUR_CHAT_ID;
 const linksTG = `<a href="https://t.me/lazyTradings">Telegram</a> | <a href="https://www.youtube.com/@SYSTEMTRADING_/featured">YouTube</a> | <a href="https://okx.com/join/99552116">OKX</a> | <a href="https://www.bybit.com/invite?ref=LXYQQ6">Bybit</a> | <a href="https://share.bitget.com/u/KKJ0NUVS)">Bitget</a> `
-console.log("YOUR_BOT_TOKEN",process.env.YOUR_BOT_TOKEN)
+const botButtons = {
+    getNews: '📥 Получить новости'
+}
+// console.log("YOUR_BOT_TOKEN",process.env.YOUR_BOT_TOKEN)
 function formatNews(newsArray, emoji = '📰') {
     return '\n#Новости\n\n' + newsArray
         .map(n =>
@@ -146,6 +149,31 @@ bot_1.command('news', async (ctx) => {
         ...coinMarketCup]), {parse_mode: 'HTML'})
     // ctx.replyWithMarkdown(formatNews(coinMarketCup,), {parse_mode: 'HTML'})
 });
+
+// стартовое сообщение с кнопкой
+bot.start((ctx) => {
+    ctx.reply(
+        'Привет! Нажми кнопку ниже, чтобы получить новости 👇',
+        Markup.keyboard([[botButtons.getNews]]).resize()
+    );
+});
+
+// обработка кнопки
+bot.hears(botButtons.getNews, async (ctx) => {
+    // Здесь можно вставить парсинг или загрузку новостей
+    ctx.reply('Собираю новости, подожди немного...');
+    const [
+        cryptoNewsNet,
+        coinMarketCup,
+    ] = await Promise.all([
+        getCryptoNewsNet(),
+        getCoinMarketCup(),
+    ]);
+
+    await ctx.replyWithMarkdown(formatNews([...cryptoNewsNet,
+        ...coinMarketCup]), {parse_mode: 'HTML'})
+});
+
 // Автоматическая отправка каждые 6 часов
 cron.schedule('0 */6 * * *', async () => {
 
