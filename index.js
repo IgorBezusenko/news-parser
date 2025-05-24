@@ -9,7 +9,7 @@ const {formatDate} = require('date-fns');
 const YOUR_BOT_TOKEN = process.env.YOUR_BOT_TOKEN;
 const YOUR_CHAT_ID = process.env.YOUR_CHAT_ID;
 const linksTG = `<a href="https://t.me/lazyTradings">Telegram</a> | <a href="https://www.youtube.com/@SYSTEMTRADING_/featured">YouTube</a> | <a href="https://okx.com/join/99552116">OKX</a> | <a href="https://www.bybit.com/invite?ref=LXYQQ6">Bybit</a> | <a href="https://share.bitget.com/u/KKJ0NUVS)">Bitget</a> `
-
+console.log("YOUR_BOT_TOKEN",process.env.YOUR_BOT_TOKEN)
 function formatNews(newsArray, emoji = '📰') {
     return '\n#Новости\n\n' + newsArray
         .map(n =>
