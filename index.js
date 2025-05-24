@@ -21,7 +21,7 @@ function formatNews(newsArray, emoji = '📰') {
         .join('\n\n') + `\n\n ${linksTG}`;
 }
 
-const bot_1 = new Telegraf(YOUR_BOT_TOKEN); // замени на свой токен
+const bot = new Telegraf(YOUR_BOT_TOKEN); // замени на свой токен
 
 // Парсер Cointelegraph
 // async function getCointelegraphNews() {
@@ -133,7 +133,7 @@ async function getCryptoNewsNet() {
 // console.log("resss", resss)
 // console.log("resss1", resss1)
 //Команда /news
-bot_1.command('news', async (ctx) => {
+bot.command('news', async (ctx) => {
     ctx.reply('Собираю новости, подожди немного...');
     const [
         cryptoNewsNet,
@@ -190,11 +190,11 @@ cron.schedule('0 */6 * * *', async () => {
     ]);
 
 
-    await bot_1.telegram.sendMessage(chatId, formatNews([...cryptoNewsNet,
+    await bot.telegram.sendMessage(chatId, formatNews([...cryptoNewsNet,
         ...coinMarketCup]), {parse_mode: 'HTML'});
     // await bot_1.telegram.sendMessage(chatId, formatNews(coinMarketCup,), {parse_mode: 'HTML'});
     // await bot_1.telegram.sendMessage(chatId, "message", {parse_mode: 'Markdown'});
 });
 
 
-bot_1.launch();
+bot.launch();
