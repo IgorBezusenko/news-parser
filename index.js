@@ -1,17 +1,23 @@
-// const { Telegraf } = require('telegraf');
-// const fetch = require('node-fetch');
-// const cheerio = require('cheerio');
-// const cron = require('node-cron');
+require("dotenv").config();
+const cron = require("node-cron");
+const cheerio = require("cheerio");
+const axios = require('axios');
+const {Telegraf} = require('telegraf');
+const {ru} = require('date-fns/locale');
+const {formatDate} = require('date-fns');
 
-import fetch from 'node-fetch';
-import * as cheerio from 'cheerio';
-import {Telegraf} from 'telegraf';
-import {formatDate,} from "date-fns";
-import {ru} from 'date-fns/locale'
-import * as cron from "node-cron";
+const YOUR_BOT_TOKEN = process.env.YOUR_BOT_TOKEN;
+const YOUR_CHAT_ID = process.env.YOUR_CHAT_ID;
+const linksTG = `<a href="https://t.me/lazyTradings">Telegram</a> | <a href="https://www.youtube.com/@SYSTEMTRADING_/featured">YouTube</a> | <a href="https://okx.com/join/99552116">OKX</a> | <a href="https://www.bybit.com/invite?ref=LXYQQ6">Bybit</a> | <a href="https://share.bitget.com/u/KKJ0NUVS)">Bitget</a> `
 
-const YOUR_BOT_TOKEN = ''
-const YOUR_CHAT_ID = ""
+function formatNews(newsArray, emoji = '📰') {
+    return '\n#Новости\n\n' + newsArray
+        .map(n =>
+            `${emoji}  <b>${n.title}</b>\n${n.description ? n.description : ''} <a href="${n.link}">Источник</a>`
+        )
+        .join('\n\n') + `\n\n ${linksTG}`;
+}
+
 const bot_1 = new Telegraf(YOUR_BOT_TOKEN); // замени на свой токен
 
 // Парсер Cointelegraph
@@ -53,8 +59,7 @@ const bot_1 = new Telegraf(YOUR_BOT_TOKEN); // замени на свой ток
 
 // Парсер ProFinance
 async function getCoinMarketCup() {
-    const res = await fetch('https://coinmarketcap.com/ru/headlines/news/');
-    const html = await res.text();
+    const {data: html} = await axios.get('https://coinmarketcap.com/ru/headlines/news/');
     const $ = cheerio.load(html);
     const news = [];
 
@@ -87,8 +92,7 @@ async function getCoinMarketCup() {
 
 // Парсер CryptoNews
 async function getCryptoNewsNet() {
-    const res = await fetch('https://cryptonews.net/ru/editorial/all-posts/');
-    const html = await res.text();
+    const {data: html} = await axios.get('https://cryptonews.net/ru/editorial/all-posts/');
     const $ = cheerio.load(html);
     const news = [];
 
@@ -142,7 +146,6 @@ bot_1.command('news', async (ctx) => {
         ...coinMarketCup]), {parse_mode: 'HTML'})
     // ctx.replyWithMarkdown(formatNews(coinMarketCup,), {parse_mode: 'HTML'})
 });
-const linksTG = `<a href="https://t.me/lazyTradings">Telegram</a> | <a href="https://www.youtube.com/@SYSTEMTRADING_/featured">YouTube</a> | <a href="https://okx.com/join/99552116">OKX</a> | <a href="https://www.bybit.com/invite?ref=LXYQQ6">Bybit</a> | <a href="https://share.bitget.com/u/KKJ0NUVS)">Bitget</a> `
 // Автоматическая отправка каждые 6 часов
 cron.schedule('0 */6 * * *', async () => {
 
@@ -165,13 +168,5 @@ cron.schedule('0 */6 * * *', async () => {
     // await bot_1.telegram.sendMessage(chatId, "message", {parse_mode: 'Markdown'});
 });
 
-// ${n.publishedDate ? n.publishedDate + '\n\n' : ""}
-function formatNews(newsArray, emoji = '📰') {
-    return '\n#Новости\n\n' + newsArray
-        .map(n =>
-            `${emoji}  <b>${n.title}</b>\n${n.description ? n.description : ''} <a href="${n.link}">Источник</a>`
-        )
-        .join('\n\n') + `\n\n ${linksTG}`;
-}
 
 bot_1.launch();
