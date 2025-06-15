@@ -14,7 +14,7 @@ const botButtons = {
 }
 // console.log("YOUR_BOT_TOKEN",process.env.YOUR_BOT_TOKEN)
 function formatNews(newsArray, emoji = '📰') {
-    return '\n#Новости\n\n' + newsArray
+    return newsArray
         .map(n =>
             `${emoji}  <b>${n.title}</b>\n${n.description ? n.description : ''} <a href="${n.link}">Источник</a>`
         )
